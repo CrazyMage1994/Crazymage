@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssmo.dao.StaffMapper">
+	<resultMap type="com.ssmo.pojo.Staff" id="staff-result">
+		<result property="ename" column="ENAME" />
+		<result property="dname" column="DNAME" />
+		<result property="sal" column="SAL" />
+		<result property="loc" column="LOC" />
+		<result property="job" column="JOB" />
+	</resultMap>
+	<!-- -->
+	<sql id="pagerSQLHeader">
+		select ENAME,DNAME,SAL,LOC,JOB from(select row_number()
+		over(
+	</sql>
+	<sql id="orderBy">
+		order by sal desc
+	</sql>
+	
+	<!-- 分页尾部 -->
+	<sql id="pegerSQLFoot">
+		<!--![CDATA[)where rn > #{pageno} and rn <=#{pagesize}]]吧内容转化为纯字符串 -->
+ 	<![CDATA[)where rn >#{pageno} and rn<=#{pagesize}]]>
+	</sql>
+	<!--分页查询 -->
+	<select id="findPager" resultMap="staff-result">
+		<include refid="pagerSQLHeader" />
+		<include refid="orderBy" />
+		) rn,t.* from (select e.ename ,e.job,e.sal,d.dname,d.loc from emp e,dept d where e.deptno=d.deptno) t
+		<include refid="pegerSQLFoot"/>
+	</select>
+
+	<!--总记录查询 -->
+	<select id="findTotal" resultType="int">
+		select count(ename) from (select e.ename ,e.job,e.sal,d.dname,d.loc from emp e,dept d where e.deptno=d.deptno)
+	</select>
+	
+	
+</mapper>
